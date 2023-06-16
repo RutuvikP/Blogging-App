@@ -14,6 +14,7 @@ export default function Blogs() {
     console.log(blogStore,"blog");
     const dispatch=useDispatch();
     const [searchParams,setSearchParams]=useSearchParams();
+    // use states
     const [title,setTitle] = useState("");
     const [content,setContent] = useState("");
     const [category,setCategory] = useState("");
@@ -22,6 +23,8 @@ export default function Blogs() {
     const [filterCategory,setFilterCategory]=useState("");
     const [filterTitle,setFilterTitle] = useState("");
     const [orderBy,setOrderBy]=useState("");
+    const [commentText,setcommentText]=useState("");
+    const [showCommentInput,setshowCommentInput]=useState(false);
     const avatar="https://img.freepik.com/free-psd/3d-illustration-person-with-sunglasses_23-2149436188.jpg?size=626&ext=jpg"
 
     // params
@@ -70,6 +73,17 @@ export default function Blogs() {
                 duration:3000,
                 position:'top'
             })
+        })
+    }
+
+    // for comments
+    const handleComment=(blogID,comments)=>{
+        const payload={"username":authStore.user.username,"text":commentText}
+        comments.push(payload)
+        dispatch(updateBlog({"comments":comments},blogID,authStore.token)).then((res)=>{
+            dispatch(getBlog(params,authStore.token))
+            setcommentText("")
+            setshowCommentInput(false)
         })
     }
 
@@ -167,6 +181,25 @@ export default function Blogs() {
                     </HStack>
                     <Text mt={'5px'}>{el.content}</Text>
                     <Text mt={'5px'} cursor={'pointer'} onClick={()=>handleLikes(el._id,el.likes)}>{el.likes} ❤️</Text>
+                    {/* comment section */}
+                    <Text fontWeight={'semibold'}>Total Comments: {el.comments.length}</Text>
+                    <Text textDecoration={'underline'} color={'gray'} cursor={'pointer'} onClick={()=>setshowCommentInput(!showCommentInput)}>Add Comment</Text>
+                    {showCommentInput?(<Center>
+                        <FormControl>
+                            <Input type="text" placeholder="Add Your Comment" onChange={(e)=>setcommentText(e.target.value)}/>
+                            <Button colorScheme="pink" variant={'outline'} onClick={()=>handleComment(el._id,el.comments)}>ADD</Button>
+                        </FormControl>
+                    </Center>):null}
+                    {el.comments && el.comments.map((item)=>(
+                        <Box p={'2px'} m={'2px'}>
+                            <HStack>
+                                <Text fontWeight={'semibold'} color={'gray'}>{item.username} <Text as={'span'} color={'gray'}>Commented..</Text></Text>
+                                <Text fontWeight={'bold'}>{item.text}</Text>
+                            </HStack>
+                        </Box>
+                    ))}
+
+                    {/* edit n delete */}
                     {el.authorID===authStore.user._id?<Button mt={'5px'} colorScheme="blue">Edit</Button>:null}
                     {el.authorID===authStore.user._id?<Button onClick={()=>handleDelete(el._id)} mt={'5px'} colorScheme="pink">Delete</Button>:null}
                 </Box>
