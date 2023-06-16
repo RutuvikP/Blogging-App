@@ -191,7 +191,7 @@ export default function Blogs() {
                         </FormControl>
                     </Center>):null}
                     {el.comments && el.comments.map((item)=>(
-                        <Box p={'2px'} m={'2px'}>
+                        <Box p={'2px'} m={'2px'} key={item.text}>
                             <HStack>
                                 <Text fontWeight={'semibold'} color={'gray'}>{item.username} <Text as={'span'} color={'gray'}>Commented..</Text></Text>
                                 <Text fontWeight={'bold'}>{item.text}</Text>
