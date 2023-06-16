@@ -1,7 +1,7 @@
 import { Box, Button, Center, FormControl, FormLabel, HStack, Image, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Select, Text, Textarea, VStack, useDisclosure, useToast } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { addBlog, getBlog } from "../redux/blogReducer/action";
+import { addBlog, deleteBlog, getBlog, updateBlog } from "../redux/blogReducer/action";
 import { useSearchParams } from "react-router-dom";
 
 export default function Blogs() {
@@ -23,6 +23,8 @@ export default function Blogs() {
     const [filterTitle,setFilterTitle] = useState("");
     const [orderBy,setOrderBy]=useState("");
     const avatar="https://img.freepik.com/free-psd/3d-illustration-person-with-sunglasses_23-2149436188.jpg?size=626&ext=jpg"
+
+    // params
     let params={page};
     if(filterCategory){
         params["category"]=filterCategory
@@ -35,6 +37,7 @@ export default function Blogs() {
         params["title"]=filterTitle
     }
 
+    // for adding blogs
     const handlePost=()=>{
         const payload={title,content,category,date,avatar,username:authStore.user.username}
         dispatch(addBlog(payload,authStore.token)).then((res)=>{
@@ -46,6 +49,27 @@ export default function Blogs() {
                 position:'top'
             })
             onClose()
+        })
+    }
+
+    // for increasing likes count
+    const handleLikes=(blogID,likes)=>{
+        dispatch(updateBlog({"likes":likes+1},blogID,authStore.token)).then((res)=>{
+            dispatch(getBlog(params,authStore.token))
+        })
+    }
+
+    // for deleteing
+    const handleDelete=(blogID)=>{
+        dispatch(deleteBlog(blogID,authStore.token)).then((res)=>{
+            dispatch(getBlog(params,authStore.token))
+            toast({
+                title:"Blog Deleted",
+                status:"info",
+                isClosable:true,
+                duration:3000,
+                position:'top'
+            })
         })
     }
 
@@ -142,9 +166,9 @@ export default function Blogs() {
                         </VStack>
                     </HStack>
                     <Text mt={'5px'}>{el.content}</Text>
-                    <Text mt={'5px'}>{el.likes} ❤️</Text>
+                    <Text mt={'5px'} cursor={'pointer'} onClick={()=>handleLikes(el._id,el.likes)}>{el.likes} ❤️</Text>
                     {el.authorID===authStore.user._id?<Button mt={'5px'} colorScheme="blue">Edit</Button>:null}
-                    {el.authorID===authStore.user._id?<Button mt={'5px'} colorScheme="pink">Delete</Button>:null}
+                    {el.authorID===authStore.user._id?<Button onClick={()=>handleDelete(el._id)} mt={'5px'} colorScheme="pink">Delete</Button>:null}
                 </Box>
             ))}
             <Center>

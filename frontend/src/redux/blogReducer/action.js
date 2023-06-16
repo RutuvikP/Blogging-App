@@ -32,3 +32,31 @@ export const getBlog = (obj, token) => (dispatch) => {
             dispatch({ type: FAIL })
         })
 }
+
+// update blog
+export const updateBlog=(obj,blogID,token)=>(dispatch)=>{
+    dispatch({ type: REQUEST })
+    let configs={headers: { "Authorization": `Bearer ${token}` }}
+    return axios.patch(`http://localhost:8080/blogs/update/${blogID}`,obj,configs)
+    .then((res)=>{
+        console.log(res);
+    })
+    .catch((err)=>{
+        console.log(err);
+        dispatch({ type: FAIL })
+    })
+}
+
+// delete blog
+export const deleteBlog=(blogID,token)=>(dispatch)=>{
+    dispatch({ type: REQUEST })
+    let configs={headers: { "Authorization": `Bearer ${token}` }}
+    return axios.delete(`http://localhost:8080/blogs/delete/${blogID}`,configs)
+    .then((res)=>{
+        console.log(res);
+    })
+    .catch((err)=>{
+        console.log(err);
+        dispatch({ type: FAIL })
+    })
+}
