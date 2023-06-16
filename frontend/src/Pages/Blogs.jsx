@@ -24,7 +24,6 @@ export default function Blogs() {
     const [filterTitle,setFilterTitle] = useState("");
     const [orderBy,setOrderBy]=useState("");
     const [commentText,setcommentText]=useState("");
-    const [showCommentInput,setshowCommentInput]=useState(false);
     const avatar="https://img.freepik.com/free-psd/3d-illustration-person-with-sunglasses_23-2149436188.jpg?size=626&ext=jpg"
 
     // params
@@ -83,7 +82,6 @@ export default function Blogs() {
         dispatch(updateBlog({"comments":comments},blogID,authStore.token)).then((res)=>{
             dispatch(getBlog(params,authStore.token))
             setcommentText("")
-            setshowCommentInput(false)
         })
     }
 
@@ -170,28 +168,31 @@ export default function Blogs() {
             </Modal>
             {/* modal finish */}
             {blogStore.blogs && blogStore.blogs.map((el)=>(
-                <Box key={el._id} w={'30%'} m={'auto'} p={'10px'} mt={'20px'} mb={'10px'} boxShadow={"rgba(0, 0, 0, 0.16) 0px 10px 36px 0px, rgba(0, 0, 0, 0.06) 0px 0px 0px 1px"}>
-                    <HStack w={'60%'} m={'auto'}>
-                        <Image src={el.avatar} borderRadius={'50%'} w={'80px'}/>
+                <Box key={el._id} w={'40%'} m={'auto'} p={'10px'} mt={'20px'} mb={'10px'} boxShadow={"rgba(0, 0, 0, 0.16) 0px 10px 36px 0px, rgba(0, 0, 0, 0.06) 0px 0px 0px 1px"}>
+                    <Center>
+                    <HStack alignItems={'center'}>
+                        <Image src={el.avatar} borderRadius={'50%'} w={'90px'}/>
                         <VStack gap={'1px'}>
-                            <Text fontWeight={'bold'}>{el.title}</Text>
+                            <Text fontWeight={'bold'} textDecoration={'underline'}>{el.title}</Text>
                             <Text fontWeight={'semibold'}>{el.category}</Text>
                             <Text fontWeight={'semibold'} color={'gray'}>Date: {el.date}</Text>
+                            <Text fontWeight={'semibold'} color={'gray'} fontSize={'sm'}>Blog by {el.username}</Text>
                         </VStack>
                     </HStack>
-                    <Text mt={'5px'}>{el.content}</Text>
-                    <Text mt={'5px'} cursor={'pointer'} onClick={()=>handleLikes(el._id,el.likes)}>{el.likes} ❤️</Text>
+                    </Center>
+                    <Text mt={'10px'}>{el.content}</Text>
+                    <Text mt={'5px'} cursor={'pointer'} fontWeight={'bold'} onClick={()=>handleLikes(el._id,el.likes)}><Button size={'md'} colorScheme="pink" variant={'outline'}>{el.likes} ❤️</Button></Text>
                     {/* comment section */}
                     <Text fontWeight={'semibold'}>Total Comments: {el.comments.length}</Text>
-                    <Text textDecoration={'underline'} color={'gray'} cursor={'pointer'} onClick={()=>setshowCommentInput(!showCommentInput)}>Add Comment</Text>
-                    {showCommentInput?(<Center>
-                        <FormControl>
-                            <Input type="text" placeholder="Add Your Comment" onChange={(e)=>setcommentText(e.target.value)}/>
-                            <Button colorScheme="pink" variant={'outline'} onClick={()=>handleComment(el._id,el.comments)}>ADD</Button>
-                        </FormControl>
-                    </Center>):null}
+                    {/* <Text textDecoration={'underline'} color={'gray'} cursor={'pointer'} onClick={()=>setshowCommentInput(!showCommentInput)}>Add Comment</Text> */}
+                    <Center mb={'20px'}>
+                        <HStack>
+                            <Input size={'md'} type="text" placeholder="Add Your Comment" onChange={(e)=>setcommentText(e.target.value)}/>
+                            <Button size={'sm'} colorScheme="pink" variant={'outline'} onClick={()=>handleComment(el._id,el.comments)}>ADD</Button>
+                        </HStack>
+                    </Center>
                     {el.comments && el.comments.map((item)=>(
-                        <Box p={'2px'} m={'2px'} key={item.text}>
+                        <Box p={'2px'} m={'2px'} key={item.text+item.username}>
                             <HStack>
                                 <Text fontWeight={'semibold'} color={'gray'}>{item.username} <Text as={'span'} color={'gray'}>Commented..</Text></Text>
                                 <Text fontWeight={'bold'}>{item.text}</Text>
